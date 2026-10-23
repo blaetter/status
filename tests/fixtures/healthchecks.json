@@ -1,0 +1,6 @@
+{"checks":[
+  {"name":"live-health","slug":"live-health","status":"up","last_ping":"2026-10-24T08:12:30+00:00","unique_key":"x1"},
+  {"name":"stats-health","slug":"stats-health","status":"down","last_ping":"2026-10-24T07:50:00+00:00","unique_key":"x2"},
+  {"name":"live-borg","slug":"live-borg","status":"new","last_ping":null,"unique_key":"x3"},
+  {"name":"geheimer-check","slug":"geheimer-check","status":"up","last_ping":"2026-10-24T08:00:00+00:00","unique_key":"x4"}
+]}

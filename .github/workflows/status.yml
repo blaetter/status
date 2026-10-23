@@ -1,0 +1,73 @@
+name: Status aktualisieren
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # Statusseite neu erzeugen
+    - cron: "17 4 * * 1"    # montags: Lebenszeichen, damit GitHub den Zeitplan nicht abschaltet
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Tests
+        run: tests/run.sh
+
+      - name: status.json erzeugen
+        env:
+          UPDOWN_API_KEY: ${{ secrets.UPDOWN_API_KEY }}
+          HEALTHCHECKS_API_KEY: ${{ secrets.HEALTHCHECKS_API_KEY }}
+        run: |
+          mkdir -p _site
+          cp -r index.html assets .nojekyll _site/
+          scripts/build-status.sh _site/status.json
+
+      - uses: actions/configure-pages@v5.0.0
+
+      - uses: actions/upload-pages-artifact@v3.0.1
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4.0.5
+
+  # Öffentliche Repos ohne Aktivität seit 60 Tagen verlieren ihre Zeitpläne.
+  keepalive:
+    if: github.event.schedule == '17 4 * * 1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Lebenszeichen committen
+        run: |
+          date -u +%FT%TZ > .github/keepalive
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/keepalive
+          git commit -m "Lebenszeichen für den Zeitplan"
+          git push

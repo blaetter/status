@@ -1,0 +1,25 @@
+{
+  "sample": true,
+  "generated": "2026-10-24T08:15:00Z",
+  "links": {
+    "updown": "https://updown.io/checks",
+    "healthchecks": "https://healthchecks.io/"
+  },
+  "websites": [
+    { "name": "www.blaetter.de", "url": "https://www.blaetter.de/", "up": true, "ssl_days": 36 },
+    { "name": "umfrage.blaetter.de", "url": "https://umfrage.blaetter.de/", "up": true, "ssl_days": 76 },
+    { "name": "pepgen.blaetter.de", "url": "https://pepgen.blaetter.de/health", "up": true, "ssl_days": 56 },
+    { "name": "stats.blaetter.de", "url": "https://stats.blaetter.de/", "up": false, "ssl_days": 89 },
+    { "name": "blaetter.de", "url": "https://blaetter.de/", "up": true, "ssl_days": 36 },
+    { "name": "insel-der-vernunft.de", "url": "https://insel-der-vernunft.de/", "up": true, "ssl_days": 12 }
+  ],
+  "servers": [
+    { "name": "Live-Server", "status": "up", "last_ping": "2026-10-24T08:12:30Z" },
+    { "name": "Statistik-Server", "status": "down", "last_ping": "2026-10-24T07:50:00Z" },
+    { "name": "Stage-Server", "status": "up", "last_ping": "2026-10-24T08:10:02Z" }
+  ],
+  "backups": [
+    { "name": "Datenbank-Sicherung", "status": "up", "last_ping": "2026-10-24T01:32:00Z" },
+    { "name": "Borg-Sicherung", "status": "grace", "last_ping": "2026-10-24T06:05:00Z" }
+  ]
+}

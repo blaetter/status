@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Blätter Status</title>
+<link rel="icon" href="assets/img/logo_palm.svg" type="image/svg+xml">
+<style>
+/* Layout: eine schmale Spalte wie ein Inhaltsverzeichnis – Kopf mit Logo, Gesamtzustand, dann je Bereich eine Liste. */
+@font-face { font-family: "playfair"; font-weight: 700; font-style: normal; font-display: swap; src: url(assets/fonts/playfair-700.woff2) format("woff2"); }
+@font-face { font-family: "droid-sans"; font-weight: 400; font-style: normal; font-display: swap; src: url(assets/fonts/droid-sans-400.woff2) format("woff2"); }
+@font-face { font-family: "droid-sans"; font-weight: 700; font-style: normal; font-display: swap; src: url(assets/fonts/droid-sans-700.woff2) format("woff2"); }
+
+:root {
+  /* Farben aus dem Blätter-Theme (palm) */
+  --bg: #ffffff;
+  --surface: #f2f2f2;
+  --rule: #e3e3e3;
+  --text: #000000;
+  --muted: #6b6b6b;
+  --brand: #e71835;
+  --link: #086d9a;
+  --ok: #2f7d32;
+  --ok-bg: #e6f2e6;
+  --warn: #8a5a00;
+  --warn-bg: #fbefd5;
+  --bad: #b3122a;
+  --bad-bg: #fad1d7;
+  --font-display: "playfair", "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "droid-sans", "Noto Sans", "Open Sans", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141414;
+    --surface: #1f1f1f;
+    --rule: #333333;
+    --text: #f2f2f2;
+    --muted: #a6a6a6;
+    --link: #4fb0dc;
+    --ok: #7fcf83;
+    --ok-bg: #1c3320;
+    --warn: #f0c060;
+    --warn-bg: #3a2e12;
+    --bad: #ff8a9b;
+    --bad-bg: #44161e;
+    color-scheme: dark;
+  }
+  .claim { filter: invert(1); }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 var(--font-body);
+}
+a { color: var(--link); }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+.wrap {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding-block: 1.5rem 3rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Kopf wie auf blaetter.de: Palme im Sechseck, daneben der Schriftzug */
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid var(--brand);
+}
+.logo { display: flex; align-items: center; gap: .6rem; text-decoration: none; }
+.logo .palm { height: 52px; width: auto; }
+.logo .claim { height: 36px; width: auto; }
+.masthead .label {
+  font: 700 .8rem/1 var(--font-body);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Gesamtzustand */
+.summary { padding-block: 2rem 1.5rem; display: grid; gap: .5rem; }
+.summary h1 {
+  margin: 0;
+  font: 700 clamp(1.9rem, 5vw, 2.6rem)/1.15 var(--font-display);
+  text-wrap: balance;
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+}
+.dot { flex: none; width: .7em; height: .7em; border-radius: 50%; background: var(--muted); }
+.state-ok .dot { background: var(--ok); }
+.state-warn .dot { background: var(--warn); }
+.state-bad .dot { background: var(--bad); }
+.summary p { margin: 0; color: var(--muted); }
+.summary p.affected { color: var(--bad); font-weight: 700; }
+
+.notice {
+  margin-top: .5rem;
+  padding: .6rem .8rem;
+  background: var(--warn-bg);
+  color: var(--text);
+  font-size: .9rem;
+}
+
+/* Bereiche */
+section { margin-top: 2rem; }
+section h2 {
+  margin: 0 0 .25rem;
+  font: 700 1.35rem/1.3 var(--font-display);
+}
+section h2 small {
+  font: 400 .85rem var(--font-body);
+  color: var(--muted);
+  margin-left: .4rem;
+}
+ul.checks { list-style: none; margin: 0; padding: 0; }
+ul.checks li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: .25rem 1rem;
+  align-items: center;
+  padding: .75rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.name { font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.detail { grid-column: 1; color: var(--muted); font-size: .875rem; font-variant-numeric: tabular-nums; }
+.pill {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: end;
+  padding: .2rem .65rem;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+}
+.pill.ok { background: var(--ok-bg); color: var(--ok); }
+.pill.warn { background: var(--warn-bg); color: var(--warn); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: .875rem;
+  display: grid;
+  gap: .5rem;
+}
+footer p { margin: 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .state-bad .dot { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <a class="logo" href="https://www.blaetter.de/" title="Zur Website der Blätter">
+      <img class="palm" src="assets/img/logo_palm.svg" alt="">
+      <img class="claim" src="assets/img/logo_blaetter_claim.svg" alt="Blätter für deutsche und internationale Politik">
+    </a>
+    <span class="label">Status</span>
+  </header>
+
+  <div id="summary" class="summary">
+    <h1><span class="dot"></span><span id="headline">Status wird geladen …</span></h1>
+    <p id="stand">Die Seite wird alle 5 Minuten aktualisiert.</p>
+  </div>
+
+  <main id="sections"></main>
+
+  <footer>
+    <p>Diese Seite zeigt nur, ob die Dienste der Blätter erreichbar sind. Bei Störungen wird das Team automatisch benachrichtigt.</p>
+    <p id="links">Details (Anmeldung erforderlich):
+      <a id="link-updown" href="https://updown.io/checks">Websites bei updown.io</a> ·
+      <a id="link-hc" href="https://healthchecks.io/">Server und Sicherungen bei healthchecks.io</a>
+    </p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var SSL_WARN_DAYS = 14;
+  var STALE_MINUTES = 20;
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function ago(iso) {
+    if (!iso) return "noch keine Meldung";
+    var min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+    if (min < 1) return "gerade eben";
+    if (min < 60) return "vor " + min + " Min.";
+    var h = Math.round(min / 60);
+    if (h < 48) return "vor " + h + " Std.";
+    return "vor " + Math.round(h / 24) + " Tagen";
+  }
+
+  function clock(iso) {
+    var d = new Date(iso);
+    return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }) +
+      ", " + d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + " Uhr";
+  }
+
+  // Website: erreichbar und Zertifikat
+  function website(w) {
+    if (!w.up) return { level: "bad", pill: "gestört", detail: "nicht erreichbar" };
+    if (w.ssl_days != null && w.ssl_days < SSL_WARN_DAYS)
+      return { level: "warn", pill: "Zertifikat", detail: "Zertifikat läuft in " + w.ssl_days + " Tagen ab" };
+    return { level: "ok", pill: "läuft", detail: w.ssl_days != null ? "Zertifikat noch " + w.ssl_days + " Tage gültig" : "" };
+  }
+
+  // Server und Sicherungen: Zustand laut healthchecks.io
+  function heartbeat(c) {
+    var last = "letzte Meldung " + ago(c.last_ping);
+    switch (c.status) {
+      case "up": return { level: "ok", pill: "in Ordnung", detail: last };
+      case "grace": return { level: "warn", pill: "überfällig", detail: last };
+      case "down": return { level: "bad", pill: "gestört", detail: last };
+      case "paused": return { level: "", pill: "pausiert", detail: last };
+      default: return { level: "", pill: "noch offen", detail: last };
+    }
+  }
+
+  function section(title, items, judge) {
+    if (!items || !items.length) return null;
+    var s = el("section");
+    var h = el("h2", null, title);
+    var bad = 0;
+    var rows = items.map(function (it) {
+      var r = judge(it);
+      if (r.level === "bad" || r.level === "warn") bad++;
+      if (r.level === "bad") affected.push(it.name);
+      var li = el("li");
+      li.appendChild(el("span", "name", it.name));
+      li.appendChild(el("span", "pill " + r.level, r.pill));
+      li.appendChild(el("span", "detail", r.detail));
+      return { li: li, level: r.level };
+    });
+    h.appendChild(el("small", null, bad ? bad + " von " + items.length + " mit Problem" : "alle " + items.length + " in Ordnung"));
+    s.appendChild(h);
+    var ul = el("ul", "checks");
+    rows.forEach(function (r) { ul.appendChild(r.li); });
+    s.appendChild(ul);
+    return { node: s, levels: rows.map(function (r) { return r.level; }) };
+  }
+
+  var affected = [];
+
+  function render(data) {
+    affected = [];
+    var main = document.getElementById("sections");
+    main.textContent = "";
+    var parts = [
+      section("Websites", data.websites, website),
+      section("Server", data.servers, heartbeat),
+      section("Sicherungen", data.backups, heartbeat)
+    ].filter(Boolean);
+    var levels = [];
+    parts.forEach(function (p) { main.appendChild(p.node); levels = levels.concat(p.levels); });
+
+    var nBad = levels.filter(function (l) { return l === "bad"; }).length;
+    var nWarn = levels.filter(function (l) { return l === "warn"; }).length;
+    var summary = document.getElementById("summary");
+    var headline;
+    if (nBad) {
+      summary.className = "summary state-bad";
+      headline = nBad === 1 ? "Eine Störung" : nBad + " Störungen";
+    } else if (nWarn) {
+      summary.className = "summary state-warn";
+      headline = nWarn === 1 ? "Ein Hinweis" : nWarn + " Hinweise";
+    } else {
+      summary.className = "summary state-ok";
+      headline = "Alles läuft";
+    }
+    document.getElementById("headline").textContent = headline;
+    document.title = (nBad ? "Störung · " : "") + "Blätter Status";
+
+    var stand = document.getElementById("stand");
+    stand.textContent = "Stand: " + clock(data.generated) + " (" + ago(data.generated) + ") · aktualisiert alle 5 Minuten";
+
+    summary.querySelectorAll(".notice, .affected").forEach(function (n) { n.remove(); });
+    if (affected.length) summary.insertBefore(el("p", "affected", "Betroffen: " + affected.join(", ")), stand);
+    var age = (Date.now() - new Date(data.generated).getTime()) / 60000;
+    var note = null;
+    if (data.sample) note = "Beispieldaten: Diese Ansicht zeigt erfundene Werte zur Vorschau.";
+    else if (age > STALE_MINUTES) note = "Die Daten sind älter als " + STALE_MINUTES + " Minuten. Die Aktualisierung hängt vermutlich; der Zustand kann sich inzwischen geändert haben.";
+    if (note) summary.appendChild(el("p", "notice", note));
+
+    if (data.links) {
+      if (data.links.updown) document.getElementById("link-updown").href = data.links.updown;
+      if (data.links.healthchecks) document.getElementById("link-hc").href = data.links.healthchecks;
+    }
+  }
+
+  function load() {
+    fetch("status.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(render)
+      .catch(function () {
+        document.getElementById("headline").textContent = "Status nicht verfügbar";
+        document.getElementById("summary").className = "summary";
+        document.getElementById("stand").textContent = "Die Statusdaten konnten nicht geladen werden. Bitte später neu laden.";
+      });
+  }
+
+  load();
+  setInterval(load, 60000);
+})();
+</script>
+</body>
+</html>

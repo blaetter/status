@@ -1,0 +1,21 @@
+{
+  "links": {
+    "updown": "https://updown.io/checks",
+    "healthchecks": "https://healthchecks.io/"
+  },
+  "websites": [
+    "www.blaetter.de",
+    "umfrage.blaetter.de",
+    "pepgen.blaetter.de",
+    "stats.blaetter.de",
+    "blaetter.de",
+    "insel-der-vernunft.de"
+  ],
+  "healthchecks": {
+    "live-health": { "label": "Live-Server", "group": "servers" },
+    "stats-health": { "label": "Statistik-Server", "group": "servers" },
+    "stage-health": { "label": "Stage-Server", "group": "servers" },
+    "live-db-backup": { "label": "Datenbank-Sicherung", "group": "backups" },
+    "live-borg": { "label": "Borg-Sicherung", "group": "backups" }
+  }
+}
