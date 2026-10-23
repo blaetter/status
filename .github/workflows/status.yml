@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v7.0.1
 
       - name: Tests
         run: tests/run.sh
@@ -34,9 +34,9 @@ jobs:
           cp -r index.html assets .nojekyll _site/
           scripts/build-status.sh _site/status.json
 
-      - uses: actions/configure-pages@v5.0.0
+      - uses: actions/configure-pages@v6.0.0
 
-      - uses: actions/upload-pages-artifact@v3.0.1
+      - uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: _site
 
@@ -52,7 +52,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4.0.5
+        uses: actions/deploy-pages@v5.0.1
 
   # Öffentliche Repos ohne Aktivität seit 60 Tagen verlieren ihre Zeitpläne.
   keepalive:
@@ -62,7 +62,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v7.0.1
       - name: Lebenszeichen committen
         run: |
           date -u +%FT%TZ > .github/keepalive
