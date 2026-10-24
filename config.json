@@ -16,6 +16,6 @@
     "stats-health": { "label": "Statistik-Server", "group": "servers" },
     "stage-health": { "label": "Stage-Server", "group": "servers" },
     "live-db-backup": { "label": "Datenbank-Sicherung", "group": "backups" },
-    "live-borg": { "label": "Borg-Sicherung", "group": "backups" }
+    "live-files-backup": { "label": "Dateisicherung", "group": "backups" }
   }
 }

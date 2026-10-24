@@ -20,6 +20,6 @@
   ],
   "backups": [
     { "name": "Datenbank-Sicherung", "status": "up", "last_ping": "2026-10-24T01:32:00Z" },
-    { "name": "Borg-Sicherung", "status": "grace", "last_ping": "2026-10-24T06:05:00Z" }
+    { "name": "Dateisicherung", "status": "grace", "last_ping": "2026-10-24T06:05:00Z" }
   ]
 }

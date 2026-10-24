@@ -1,15 +1,15 @@
 #!/bin/bash
-# Erzeugt status.json für status.blaetter.de aus updown.io und healthchecks.io.
+# Builds status.json from the updown.io and healthchecks.io APIs.
 #
-# Umgebung:
-#   UPDOWN_API_KEY, HEALTHCHECKS_API_KEY   Lese-Schlüssel der beiden Dienste
-#   UPDOWN_FILE, HEALTHCHECKS_FILE         statt der API eine Datei lesen (Tests)
-#   CONFIG                                 Konfiguration (Standard: config.json)
+# Environment:
+#   UPDOWN_API_KEY, HEALTHCHECKS_API_KEY   read-only API keys of both services
+#   UPDOWN_FILE, HEALTHCHECKS_FILE         read a file instead of calling the API (tests)
+#   CONFIG                                 configuration file (default: config.json)
 #
-# Aufruf: scripts/build-status.sh [Ausgabedatei]   (Standard: _site/status.json)
+# Usage: scripts/build-status.sh [output file]   (default: _site/status.json)
 #
-# Öffentlich landet nur, was in config.json steht: Name, läuft/läuft nicht,
-# Resttage des Zertifikats, Zustand und Zeitpunkt der letzten Meldung.
+# Only what config.json lists ends up public: display name, up/down,
+# days until certificate expiry, check state and time of the last ping.
 set -euo pipefail
 
 OUT=${1:-_site/status.json}
@@ -19,7 +19,7 @@ fetch_updown() {
   if [ -n "${UPDOWN_FILE:-}" ]; then
     cat "$UPDOWN_FILE"
   else
-    curl -fsS -m 20 --retry 3 -H "X-API-KEY: ${UPDOWN_API_KEY:?fehlt}" https://updown.io/api/checks
+    curl -fsS -m 20 --retry 3 -H "X-API-KEY: ${UPDOWN_API_KEY:?missing}" https://updown.io/api/checks
   fi
 }
 
@@ -27,7 +27,7 @@ fetch_healthchecks() {
   if [ -n "${HEALTHCHECKS_FILE:-}" ]; then
     cat "$HEALTHCHECKS_FILE"
   else
-    curl -fsS -m 20 --retry 3 -H "X-Api-Key: ${HEALTHCHECKS_API_KEY:?fehlt}" https://healthchecks.io/api/v3/checks/
+    curl -fsS -m 20 --retry 3 -H "X-Api-Key: ${HEALTHCHECKS_API_KEY:?missing}" https://healthchecks.io/api/v3/checks/
   fi
 }
 
@@ -39,7 +39,7 @@ jq -n \
   --argjson updown "$updown" \
   --argjson hc "$healthchecks" \
   --slurpfile cfg "$CONFIG" '
-  # ISO-Zeit (auch mit Sekundenbruchteilen oder +00:00) in Unix-Sekunden
+  # ISO timestamp (also with fractional seconds or +00:00) to Unix seconds
   def epoch: sub("\\.[0-9]+"; "") | sub("\\+00:00$"; "Z") | fromdateiso8601;
   def host: capture("^https?://(?<h>[^/:]+)").h;
 
@@ -76,12 +76,12 @@ jq -n \
     }
 ' > "$OUT.tmp"
 
-# Ohne Websites stimmt etwas mit der API oder der Konfiguration nicht:
-# dann lieber nichts veröffentlichen, die Seite zeigt den alten Stand als veraltet.
+# No websites means the API answer or config.json is wrong: publish nothing,
+# so the page keeps the previous state and marks it as outdated.
 if [ "$(jq '.websites | length' "$OUT.tmp")" -eq 0 ]; then
-  echo "Keine Websites gefunden – API-Antwort oder config.json prüfen" >&2
+  echo "No websites found - check the API response or config.json" >&2
   rm -f "$OUT.tmp"
   exit 1
 fi
 mv "$OUT.tmp" "$OUT"
-echo "geschrieben: $OUT"
+echo "written: $OUT"

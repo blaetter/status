@@ -7,13 +7,13 @@
 <title>Blätter Status</title>
 <link rel="icon" href="assets/img/logo_palm.svg" type="image/svg+xml">
 <style>
-/* Layout: eine schmale Spalte wie ein Inhaltsverzeichnis – Kopf mit Logo, Gesamtzustand, dann je Bereich eine Liste. */
+/* Layout: one narrow column like a table of contents - masthead, overall state, then one list per section. */
 @font-face { font-family: "playfair"; font-weight: 700; font-style: normal; font-display: swap; src: url(assets/fonts/playfair-700.woff2) format("woff2"); }
 @font-face { font-family: "droid-sans"; font-weight: 400; font-style: normal; font-display: swap; src: url(assets/fonts/droid-sans-400.woff2) format("woff2"); }
 @font-face { font-family: "droid-sans"; font-weight: 700; font-style: normal; font-display: swap; src: url(assets/fonts/droid-sans-700.woff2) format("woff2"); }
 
 :root {
-  /* Farben aus dem Blätter-Theme (palm) */
+  /* Colors from the Blätter website theme */
   --bg: #ffffff;
   --surface: #f2f2f2;
   --rule: #e3e3e3;
@@ -69,7 +69,7 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 
-/* Kopf wie auf blaetter.de: Palme im Sechseck, daneben der Schriftzug */
+/* Masthead as on blaetter.de: palm in the hexagon, wordmark next to it */
 .masthead {
   display: flex;
   align-items: center;
@@ -88,7 +88,7 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   color: var(--muted);
 }
 
-/* Gesamtzustand */
+/* Overall state */
 .summary { padding-block: 2rem 1.5rem; display: grid; gap: .5rem; }
 .summary h1 {
   margin: 0;
@@ -113,7 +113,7 @@ a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   font-size: .9rem;
 }
 
-/* Bereiche */
+/* Sections */
 section { margin-top: 2rem; }
 section h2 {
   margin: 0 0 .25rem;
@@ -225,7 +225,7 @@ footer p { margin: 0; }
       ", " + d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + " Uhr";
   }
 
-  // Website: erreichbar und Zertifikat
+  // Website: reachable, certificate validity
   function website(w) {
     if (!w.up) return { level: "bad", pill: "gestört", detail: "nicht erreichbar" };
     if (w.ssl_days != null && w.ssl_days < SSL_WARN_DAYS)
@@ -233,7 +233,7 @@ footer p { margin: 0; }
     return { level: "ok", pill: "läuft", detail: w.ssl_days != null ? "Zertifikat noch " + w.ssl_days + " Tage gültig" : "" };
   }
 
-  // Server und Sicherungen: Zustand laut healthchecks.io
+  // Servers and backups: state reported by healthchecks.io
   function heartbeat(c) {
     var last = "letzte Meldung " + ago(c.last_ping);
     switch (c.status) {
