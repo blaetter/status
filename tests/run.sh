@@ -21,7 +21,7 @@ check "servers use display names and states" '.servers == [
   {"name":"Live-Server","status":"up","last_ping":"2026-10-24T08:12:30+00:00"},
   {"name":"Statistik-Server","status":"down","last_ping":"2026-10-24T07:50:00+00:00"},
   {"name":"Stage-Server","status":null,"last_ping":null}]'
-check "backups" '[.backups[].name] == ["Datenbank-Sicherung","Dateisicherung"] and .backups[1].status == "new"'
+check "backups of both servers, in config order" '[.backups[].name] == ["Live-Server: Datenbank","Live-Server: Dateien","Live-Server: Prüfung","Statistik-Server: Datenbank","Statistik-Server: Dateien","Statistik-Server: Prüfung"] and .backups[1].status == "new" and .backups[3].status == "up" and .backups[2].status == null'
 check "checks missing from config.json stay hidden" '[.. | strings] | any(. == "secret-check") | not'
 check "timestamp and links" '(.generated | test("Z$")) and (.links.updown | startswith("https://"))'
 

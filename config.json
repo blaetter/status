@@ -15,7 +15,11 @@
     "live-health": { "label": "Live-Server", "group": "servers" },
     "stats-health": { "label": "Statistik-Server", "group": "servers" },
     "stage-health": { "label": "Stage-Server", "group": "servers" },
-    "live-db-backup": { "label": "Datenbank-Sicherung", "group": "backups" },
-    "live-files-backup": { "label": "Dateisicherung", "group": "backups" }
+    "live-db-backup": { "label": "Live-Server: Datenbank", "group": "backups" },
+    "live-files-backup": { "label": "Live-Server: Dateien", "group": "backups" },
+    "live-check-backup": { "label": "Live-Server: Prüfung", "group": "backups" },
+    "stats-db-backup": { "label": "Statistik-Server: Datenbank", "group": "backups" },
+    "stats-files-backup": { "label": "Statistik-Server: Dateien", "group": "backups" },
+    "stats-check-backup": { "label": "Statistik-Server: Prüfung", "group": "backups" }
   }
 }
