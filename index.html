@@ -6,194 +6,221 @@
 <meta name="robots" content="noindex">
 <title>Blätter Status</title>
 <link rel="icon" href="assets/img/logo_palm.svg" type="image/svg+xml">
+<script>
+  // Apply a stored light/dark choice before the page renders (see the toggle below)
+  try { var t = localStorage.getItem("status-theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+</script>
 <style>
-/* Layout: one narrow column like a table of contents - masthead, overall state, then one list per section. */
-@font-face { font-family: "playfair"; font-weight: 700; font-style: normal; font-display: swap; src: url(assets/fonts/playfair-700.woff2) format("woff2"); }
+/*
+ * Status page of the Blätter services.
+ * Design follows the design system of the Blätter archive (blaetter-archiv, docs/design-system.html):
+ * fonts, header, page heading, key figures, dividers, notice and footer. Colours are the tokens of
+ * blaetter.de (--palm-color-*), dark colours as in archiv-dark.css.
+ * State colours: the cover palette of 2026 from the archive (config/rubrics.yaml): red #C00840
+ * (covers 1 and 7), green #609030 (4 and 10), ochre #B87800 (5 and 11); on dark pages mixed with
+ * 20 % white as in archiv.js. Green and ochre reach only 3.7-3.8:1 on white, so they colour large
+ * figures and dots (3:1 is enough), never small text.
+ */
+@font-face { font-family: "droid-serif"; font-weight: 400; font-style: normal; font-display: swap; src: url(assets/fonts/droid-serif-400.woff) format("woff"); }
 @font-face { font-family: "droid-sans"; font-weight: 400; font-style: normal; font-display: swap; src: url(assets/fonts/droid-sans-400.woff2) format("woff2"); }
 @font-face { font-family: "droid-sans"; font-weight: 700; font-style: normal; font-display: swap; src: url(assets/fonts/droid-sans-700.woff2) format("woff2"); }
+@font-face { font-family: "playfair"; font-weight: 700; font-style: normal; font-display: swap; src: url(assets/fonts/playfair-700.woff2) format("woff2"); }
 
 :root {
-  /* Colors from the Blätter website theme */
-  --bg: #ffffff;
-  --surface: #f2f2f2;
-  --rule: #e3e3e3;
-  --text: #000000;
-  --muted: #6b6b6b;
-  --brand: #e71835;
-  --link: #086d9a;
-  --ok: #2f7d32;
-  --ok-bg: #e6f2e6;
-  --warn: #8a5a00;
-  --warn-bg: #fbefd5;
-  --bad: #b3122a;
-  --bad-bg: #fad1d7;
-  --font-display: "playfair", "Playfair Display", Georgia, "Times New Roman", serif;
-  --font-body: "droid-sans", "Noto Sans", "Open Sans", Arial, sans-serif;
+  --bg: #ffffff;           /* --palm-color-white */
+  --text: #000000;         /* --palm-color-text */
+  --muted: #6b6b6b;        /* archive: muted text, 5.3:1 */
+  --link: #086D9A;         /* --palm-color-link */
+  --red: #E71835;          /* --palm-color-red: labels, faults */
+  --surface: #f2f2f2;      /* --palm-color-grey */
+  --rule: #e3e3e3;         /* --palm-color-grey-dark */
+  --rule-strong: #CCCCCC;  /* --palm-color-grey-border */
+  --bad: #C00840;          /* cover red 1 and 7/2026 */
+  --ok: #609030;           /* cover green 4 and 10/2026 */
+  --warn: #B87800;         /* cover ochre 5 and 11/2026 */
+  --serif: "droid-serif", Georgia, "Times New Roman", serif;
+  --sans: "droid-sans", Arial, sans-serif;
+  --display: "playfair", Georgia, serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #141414;
-    --surface: #1f1f1f;
-    --rule: #333333;
-    --text: #f2f2f2;
-    --muted: #a6a6a6;
-    --link: #4fb0dc;
-    --ok: #7fcf83;
-    --ok-bg: #1c3320;
-    --warn: #f0c060;
-    --warn-bg: #3a2e12;
-    --bad: #ff8a9b;
-    --bad-bg: #44161e;
+  :root:not([data-theme="light"]) {
+    --bg: #161616; --text: #E8E8E8; --muted: #A3A3A3; --link: #5DB4E3; --red: #EC465D;
+    --surface: #262626; --rule: #333333; --rule-strong: #4A4A4A;
+    --bad: #CD3966; --ok: #80A659; --warn: #C69333;
     color-scheme: dark;
   }
-  .claim { filter: invert(1); }
+  :root:not([data-theme="light"]) .brand .claim { filter: invert(1) hue-rotate(180deg); }
 }
+:root[data-theme="dark"] {
+  --bg: #161616; --text: #E8E8E8; --muted: #A3A3A3; --link: #5DB4E3; --red: #EC465D;
+  --surface: #262626; --rule: #333333; --rule-strong: #4A4A4A;
+  --bad: #CD3966; --ok: #80A659; --warn: #C69333;
+  color-scheme: dark;
+}
+:root[data-theme="dark"] .brand .claim { filter: invert(1) hue-rotate(180deg); }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font: 16px/1.5 var(--font-body);
-}
-a { color: var(--link); }
-a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+html { -webkit-text-size-adjust: 100%; overflow-y: scroll; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 18px/1.6 var(--serif); }
+a { color: var(--link); text-decoration: none; }
+a:hover, a:focus { text-decoration: underline; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 
 .wrap {
-  max-width: 46rem;
+  max-width: 1100px;
   margin: 0 auto;
-  padding-block: 1.5rem 3rem;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
 }
 
-/* Masthead as on blaetter.de: palm in the hexagon, wordmark next to it */
-.masthead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 3px solid var(--brand);
-}
-.logo { display: flex; align-items: center; gap: .6rem; text-decoration: none; }
-.logo .palm { height: 52px; width: auto; }
-.logo .claim { height: 36px; width: auto; }
-.masthead .label {
-  font: 700 .8rem/1 var(--font-body);
-  letter-spacing: .12em;
+/* Header as in the archive: palm 40 px, claim 120 px, 7 px apart, thin rule below */
+/* Sticky as in the archive: stays at the top and gets smaller once scrolled; the margin below
+   grows by what the header loses, so the content does not move */
+.site-header { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--rule); padding: 14px 0; background: var(--bg); }
+.site-header.compact { padding: 10px 0; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+.site-header.compact .brand .palm { width: 30px; height: 30px; }
+.site-header.compact .brand .claim { width: 100px; height: 21.35px; }
+.site-header.compact .nav, .site-header.compact .theme-toggle { line-height: 30px; height: 30px; }
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand { line-height: 0; display: flex; align-items: center; }
+.brand .palm { width: 40px; height: 40px; }
+.brand .claim { width: 120px; height: 25.6px; margin-left: 7px; }
+.nav { display: flex; align-items: center; gap: 12px; font: 16px/40px var(--sans); }
+.nav .active { color: var(--red); }
+.theme-toggle { width: 40px; height: 40px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.theme-icon { position: relative; display: block; width: 14px; height: 14px; margin: 0 auto; border: 2px solid var(--muted); border-radius: 50%; overflow: hidden; }
+.theme-icon::before { content: ""; position: absolute; top: 0; right: 0; bottom: 0; border-left: 7px solid var(--muted); }
+.theme-toggle:hover .theme-icon, .theme-toggle:focus-visible .theme-icon,
+.theme-toggle:hover .theme-icon::before, .theme-toggle:focus-visible .theme-icon::before { border-color: var(--link); }
+
+/* Page heading: uppercase sans, red label, 5 px rule */
+.page-head { padding: 32px 0 8px; }
+.heading {
+  margin: 0 0 10px;
+  padding-bottom: 4px;
+  border-bottom: 5px solid var(--rule-strong);
+  font: 700 28px/1.2 var(--sans);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--muted);
 }
+.heading-label { color: var(--red); }
+.lede { max-width: 40em; margin: 12px 0 0; }
+.lede p { margin: 0; }
+/* State line: the result at a glance; only the dot carries the state colour */
+.state-line { margin: 18px 0 0; font: 700 30px/1.2 var(--display); display: flex; align-items: center; gap: 12px; }
+.state-line::before { content: ""; flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--muted); }
+.state-line.ok::before { background: var(--ok); }
+.state-line.warn::before { background: var(--warn); }
+.state-line.bad::before { background: var(--bad); }
+.lede .affected { color: var(--bad); font-family: var(--sans); font-weight: 700; margin-top: 6px; }
+.stand { color: var(--muted); font-family: var(--sans); font-size: 15px; margin-top: 8px; }
 
-/* Overall state */
-.summary { padding-block: 2rem 1.5rem; display: grid; gap: .5rem; }
-.summary h1 {
-  margin: 0;
-  font: 700 clamp(1.9rem, 5vw, 2.6rem)/1.15 var(--font-display);
-  text-wrap: balance;
-  display: flex;
-  align-items: center;
-  gap: .7rem;
-}
-.dot { flex: none; width: .7em; height: .7em; border-radius: 50%; background: var(--muted); }
-.state-ok .dot { background: var(--ok); }
-.state-warn .dot { background: var(--warn); }
-.state-bad .dot { background: var(--bad); }
-.summary p { margin: 0; color: var(--muted); }
-.summary p.affected { color: var(--bad); font-weight: 700; }
+/* Notice: grey surface with a 5 px rule on the left */
+.notice { margin: 16px 0 0; padding: 12px 14px; border-left: 5px solid var(--rule-strong); background: var(--surface); font: 15px/1.5 var(--sans); }
 
-.notice {
-  margin-top: .5rem;
-  padding: .6rem .8rem;
-  background: var(--warn-bg);
-  color: var(--text);
-  font-size: .9rem;
-}
+/* Key figures in Playfair, as "Das Archiv in Zahlen" */
+.figures { margin: 28px 0 0; padding: 0; list-style: none; font: 16px/1.4 var(--sans); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 2%; }
+.figure { display: block; font: 700 40px/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.figures .ok .figure { color: var(--ok); }
+.figures .bad .figure { color: var(--bad); }
+.figures .warn .figure { color: var(--warn); }
 
-/* Sections */
-section { margin-top: 2rem; }
-section h2 {
-  margin: 0 0 .25rem;
-  font: 700 1.35rem/1.3 var(--font-display);
+/* Sections: divider as above the rubrics, then one row per check */
+section { margin-top: 40px; }
+.divider {
+  position: sticky;
+  top: var(--header-h, 69px);
+  z-index: 5;
+  background: var(--bg);
+  box-shadow: 0 6px 0 var(--bg);   /* also hides rows in the gap below the rule while they scroll past */
+  margin: 0 0 6px;
+  padding: 6px 0 3px;
+  border-bottom: 5px solid var(--rule-strong);
+  font: 700 16px/1.4 var(--sans);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
-section h2 small {
-  font: 400 .85rem var(--font-body);
-  color: var(--muted);
-  margin-left: .4rem;
-}
-ul.checks { list-style: none; margin: 0; padding: 0; }
+.divider .count { color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 6px; }
+ul.checks { list-style: none; margin: 0; padding: 0; font-family: var(--sans); }
 ul.checks li {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: .25rem 1rem;
-  align-items: center;
-  padding: .75rem 0;
+  gap: 0 16px;
+  align-items: baseline;
+  padding: 10px 0;
   border-bottom: 1px solid var(--rule);
 }
-.name { font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
-.detail { grid-column: 1; color: var(--muted); font-size: .875rem; font-variant-numeric: tabular-nums; }
-.pill {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  justify-self: end;
-  padding: .2rem .65rem;
-  font-size: .8rem;
-  font-weight: 700;
-  letter-spacing: .02em;
-  white-space: nowrap;
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--muted);
-}
-.pill.ok { background: var(--ok-bg); color: var(--ok); }
-.pill.warn { background: var(--warn-bg); color: var(--warn); }
-.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.name { font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+.detail { grid-column: 1; color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.state { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.state::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 7px; border-radius: 50%; background: var(--muted); vertical-align: 0; }
+.state.ok::before { background: var(--ok); }
+.state.warn::before { background: var(--warn); }
+.state.bad::before { background: var(--bad); }
 
-footer {
-  margin-top: 3rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--rule);
-  color: var(--muted);
-  font-size: .875rem;
-  display: grid;
-  gap: .5rem;
-}
-footer p { margin: 0; }
+/* Footer as in the archive: palm, short text, muted */
+.site-footer { margin-top: 64px; padding: 48px 0 56px; border-top: 1px solid var(--rule); color: var(--muted); font: 15px/1.6 var(--sans); text-align: center; }
+.footer-palm { display: block; width: 70px; height: auto; margin: 0 auto; }
+.site-footer p { margin: 16px auto 0; max-width: 40em; }
 
+@media (max-width: 700px) {
+  body { font-size: 17px; }
+  .brand .palm { width: 30px; height: 30px; }
+  .brand .claim { width: 100px; height: 21.35px; }
+  .site-header.compact { padding: 14px 0; margin-bottom: 0; }
+  .heading { font-size: 19px; line-height: 24px; }
+  .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 4%; }
+  .figure { font-size: 32px; }
+  .state-line { font-size: 26px; }
+  .state-line::before { width: 15px; height: 15px; }
+}
 @media (prefers-reduced-motion: no-preference) {
-  .state-bad .dot { animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 50% { opacity: .35; } }
+  .site-header, .site-header .brand img, .site-header .nav, .theme-toggle { transition: padding .3s ease-out, margin-bottom .3s ease-out, box-shadow .3s ease-out, width .3s ease-out, height .3s ease-out, line-height .3s ease-out; }
+  .figures .bad .figure, .state-line.bad::before { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .45; } }
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="masthead">
-    <a class="logo" href="https://www.blaetter.de/" title="Zur Website der Blätter">
-      <img class="palm" src="assets/img/logo_palm.svg" alt="">
-      <img class="claim" src="assets/img/logo_blaetter_claim.svg" alt="Blätter für deutsche und internationale Politik">
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="https://www.blaetter.de/" title="Zur Website der Blätter">
+      <img class="palm" src="assets/img/logo_palm.svg" width="40" height="40" alt="">
+      <img class="claim" src="assets/img/logo_blaetter_claim.svg" width="120" height="26" alt="Blätter für deutsche und internationale Politik">
     </a>
-    <span class="label">Status</span>
-  </header>
+    <div class="nav">
+      <span class="active">Status</span>
+      <button type="button" class="theme-toggle" id="theme-toggle" title="Darstellung wechseln" aria-label="Zwischen heller und dunkler Darstellung wechseln"><span class="theme-icon"></span></button>
+    </div>
+  </div>
+</header>
 
-  <div id="summary" class="summary">
-    <h1><span class="dot"></span><span id="headline">Status wird geladen …</span></h1>
-    <p id="stand">Die Seite wird alle 5 Minuten aktualisiert.</p>
+<main class="wrap">
+  <div class="page-head" id="summary">
+    <h1 class="heading"><span class="heading-label">Status</span> der Blätter-Dienste</h1>
+    <p id="state" class="state-line">wird geladen</p>
+    <div class="lede">
+      <p id="affected" class="affected" hidden></p>
+      <p id="stand" class="stand">Die Seite wird alle 5 Minuten aktualisiert.</p>
+    </div>
+    <p id="notice" class="notice" hidden></p>
+    <ul class="figures" id="figures"></ul>
   </div>
 
-  <main id="sections"></main>
+  <div id="sections"></div>
+</main>
 
-  <footer>
+<footer class="site-footer">
+  <div class="wrap">
+    <img class="footer-palm" src="assets/img/logo_palm.svg" width="70" height="81" alt="">
     <p>Diese Seite zeigt nur, ob die Dienste der Blätter erreichbar sind. Bei Störungen wird das Team automatisch benachrichtigt.</p>
-    <p id="links">Details (Anmeldung erforderlich):
+    <p>Details (Anmeldung erforderlich):
       <a id="link-updown" href="https://updown.io/checks">Websites bei updown.io</a> ·
       <a id="link-hc" href="https://healthchecks.io/">Server und Sicherungen bei healthchecks.io</a>
     </p>
-  </footer>
-</div>
+  </div>
+</footer>
 
 <script>
 (function () {
@@ -202,10 +229,39 @@ footer p { margin: 0; }
   var SSL_WARN_DAYS = 14;
   var STALE_MINUTES = 20;
   // Live data comes from the branch status-data, so data updates need no Pages deployment.
-  // Local preview reads the sample status.json next to this file.
+  // Local preview reads the sample data next to this file: status.json, or ?sample=ok for status.ok.json.
+  var sample = (location.search.match(/[?&]sample=([a-z]+)/) || [])[1];
   var DATA_URL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
-    ? "status.json"
+    ? (sample ? "status." + sample + ".json" : "status.json")
     : "https://raw.githubusercontent.com/blaetter/status/status-data/status.json";
+
+  // Light/dark toggle: stores only a choice that differs from the system
+  var root = document.documentElement;
+  var dark = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var isDark = root.getAttribute("data-theme") ? root.getAttribute("data-theme") === "dark" : !!(dark && dark.matches);
+    var next = isDark ? "light" : "dark";
+    var system = dark && dark.matches ? "dark" : "light";
+    try {
+      if (next === system) { localStorage.removeItem("status-theme"); } else { localStorage.setItem("status-theme", next); }
+    } catch (e) {}
+    if (next === system) { root.removeAttribute("data-theme"); } else { root.setAttribute("data-theme", next); }
+  });
+
+  // Header gets smaller once the page is scrolled
+  var header = document.querySelector(".site-header");
+  function setHeaderHeight() { root.style.setProperty("--header-h", header.offsetHeight + "px"); }
+  function onScroll() { header.classList.toggle("compact", window.scrollY > 10); }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", setHeaderHeight);
+  // The dividers follow the header while it shrinks or grows
+  header.addEventListener("transitionend", setHeaderHeight);
+  header.addEventListener("transitionrun", function () {
+    var t0 = Date.now();
+    (function step() { setHeaderHeight(); if (Date.now() - t0 < 400) requestAnimationFrame(step); })();
+  });
+  onScroll();
+  setHeaderHeight();
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -232,88 +288,109 @@ footer p { margin: 0; }
 
   // Website: reachable, certificate validity
   function website(w) {
-    if (!w.up) return { level: "bad", pill: "gestört", detail: "nicht erreichbar" };
+    if (!w.up) return { level: "bad", state: "gestört", detail: "nicht erreichbar" };
     if (w.ssl_days != null && w.ssl_days < SSL_WARN_DAYS)
-      return { level: "warn", pill: "Zertifikat", detail: "Zertifikat läuft in " + w.ssl_days + " Tagen ab" };
-    return { level: "ok", pill: "läuft", detail: w.ssl_days != null ? "Zertifikat noch " + w.ssl_days + " Tage gültig" : "" };
+      return { level: "warn", state: "Zertifikat", detail: "Zertifikat läuft in " + w.ssl_days + " Tagen ab" };
+    return { level: "ok", state: "läuft", detail: w.ssl_days != null ? "Zertifikat noch " + w.ssl_days + " Tage gültig" : "" };
   }
 
   // Servers and backups: state reported by healthchecks.io
   function heartbeat(c) {
     var last = "letzte Meldung " + ago(c.last_ping);
     switch (c.status) {
-      case "up": return { level: "ok", pill: "in Ordnung", detail: last };
-      case "grace": return { level: "warn", pill: "überfällig", detail: last };
-      case "down": return { level: "bad", pill: "gestört", detail: last };
-      case "paused": return { level: "", pill: "pausiert", detail: last };
-      default: return { level: "", pill: "noch offen", detail: last };
+      case "up": return { level: "ok", state: "in Ordnung", detail: last };
+      case "grace": return { level: "warn", state: "überfällig", detail: last };
+      case "down": return { level: "bad", state: "gestört", detail: last };
+      case "paused": return { level: "", state: "pausiert", detail: last };
+      default: return { level: "", state: "noch offen", detail: last };
     }
   }
 
-  function section(title, items, judge) {
+  function section(title, items, judge, affected) {
     if (!items || !items.length) return null;
     var s = el("section");
-    var h = el("h2", null, title);
-    var bad = 0;
-    var rows = items.map(function (it) {
+    var h = el("h2", "divider", title);
+    var problems = 0;
+    var ul = el("ul", "checks");
+    var levels = items.map(function (it) {
       var r = judge(it);
-      if (r.level === "bad" || r.level === "warn") bad++;
+      if (r.level === "bad" || r.level === "warn") problems++;
       if (r.level === "bad") affected.push(it.name);
       var li = el("li");
       li.appendChild(el("span", "name", it.name));
-      li.appendChild(el("span", "pill " + r.level, r.pill));
+      li.appendChild(el("span", "state " + r.level, r.state));
       li.appendChild(el("span", "detail", r.detail));
-      return { li: li, level: r.level };
+      ul.appendChild(li);
+      return r.level;
     });
-    h.appendChild(el("small", null, bad ? bad + " von " + items.length + " mit Problem" : "alle " + items.length + " in Ordnung"));
+    h.appendChild(el("span", "count", problems ? problems + " von " + items.length + " mit Problem" : "alle " + items.length + " in Ordnung"));
     s.appendChild(h);
-    var ul = el("ul", "checks");
-    rows.forEach(function (r) { ul.appendChild(r.li); });
     s.appendChild(ul);
-    return { node: s, levels: rows.map(function (r) { return r.level; }) };
+    return { node: s, levels: levels, total: items.length, ok: levels.filter(function (l) { return l === "ok"; }).length };
   }
 
-  var affected = [];
+  function figure(value, label, level) {
+    var li = el("li", level || "");
+    li.appendChild(el("span", "figure", value));
+    li.appendChild(document.createTextNode(label));
+    return li;
+  }
 
   function render(data) {
-    affected = [];
+    var affected = [];
     var main = document.getElementById("sections");
     main.textContent = "";
-    var parts = [
-      section("Websites", data.websites, website),
-      section("Server", data.servers, heartbeat),
-      section("Sicherungen", data.backups, heartbeat)
-    ].filter(Boolean);
+    var sites = section("Websites", data.websites, website, affected);
+    var servers = section("Server", data.servers, heartbeat, affected);
+    var backups = section("Sicherungen", data.backups, heartbeat, affected);
+    var parts = [sites, servers, backups].filter(Boolean);
     var levels = [];
     parts.forEach(function (p) { main.appendChild(p.node); levels = levels.concat(p.levels); });
 
     var nBad = levels.filter(function (l) { return l === "bad"; }).length;
     var nWarn = levels.filter(function (l) { return l === "warn"; }).length;
-    var summary = document.getElementById("summary");
-    var headline;
-    if (nBad) {
-      summary.className = "summary state-bad";
-      headline = nBad === 1 ? "Eine Störung" : nBad + " Störungen";
-    } else if (nWarn) {
-      summary.className = "summary state-warn";
-      headline = nWarn === 1 ? "Ein Hinweis" : nWarn + " Hinweise";
-    } else {
-      summary.className = "summary state-ok";
-      headline = "Alles läuft";
-    }
-    document.getElementById("headline").textContent = headline;
+    var headline = nBad ? (nBad === 1 ? "Eine Störung" : nBad + " Störungen")
+      : nWarn ? (nWarn === 1 ? "Ein Hinweis" : nWarn + " Hinweise")
+      : "Alles läuft";
+    var state = document.getElementById("state");
+    state.textContent = headline;
+    state.className = "state-line " + (nBad ? "bad" : nWarn ? "warn" : "ok");
     document.title = (nBad ? "Störung · " : "") + "Blätter Status";
 
-    var stand = document.getElementById("stand");
-    stand.textContent = "Stand: " + clock(data.generated) + " (" + ago(data.generated) + ") · aktualisiert alle 5 Minuten";
+    var aff = document.getElementById("affected");
+    aff.hidden = !affected.length;
+    aff.textContent = affected.length ? "Betroffen: " + affected.join(", ") : "";
 
-    summary.querySelectorAll(".notice, .affected").forEach(function (n) { n.remove(); });
-    if (affected.length) summary.insertBefore(el("p", "affected", "Betroffen: " + affected.join(", ")), stand);
+    document.getElementById("stand").textContent =
+      "Stand: " + clock(data.generated) + " (" + ago(data.generated) + ") · aktualisiert alle 5 Minuten";
+
+    // Key figures: share of checks in order per area, nearest certificate expiry
+    var figs = document.getElementById("figures");
+    figs.textContent = "";
+    function share(p, label) {
+      if (!p) return;
+      figs.appendChild(figure(p.ok + "/" + p.total, label, p.levels.indexOf("bad") >= 0 ? "bad" : (p.ok < p.total ? "warn" : "ok")));
+    }
+    if (sites) {
+      // Reachable counts every site that is up, also one whose certificate needs attention
+      var up = data.websites.filter(function (w) { return w.up; }).length;
+      figs.appendChild(figure(up + "/" + sites.total, "Websites erreichbar", up < sites.total ? "bad" : "ok"));
+    }
+    share(servers, "Server in Ordnung");
+    share(backups, "Sicherungen in Ordnung");
+    var days = (data.websites || []).map(function (w) { return w.ssl_days; }).filter(function (d) { return d != null; });
+    if (days.length) {
+      var min = Math.min.apply(null, days);
+      figs.appendChild(figure(String(min), "Tage bis zum nächsten Zertifikatsablauf", min < SSL_WARN_DAYS ? "warn" : "ok"));
+    }
+
+    var notice = document.getElementById("notice");
     var age = (Date.now() - new Date(data.generated).getTime()) / 60000;
-    var note = null;
-    if (data.sample) note = "Beispieldaten: Diese Ansicht zeigt erfundene Werte zur Vorschau.";
-    else if (age > STALE_MINUTES) note = "Die Daten sind älter als " + STALE_MINUTES + " Minuten. Die Aktualisierung hängt vermutlich; der Zustand kann sich inzwischen geändert haben.";
-    if (note) summary.appendChild(el("p", "notice", note));
+    var note = data.sample ? "Beispieldaten: Diese Ansicht zeigt erfundene Werte zur Vorschau."
+      : age > STALE_MINUTES ? "Die Daten sind älter als " + STALE_MINUTES + " Minuten. Die Aktualisierung hängt vermutlich; der Zustand kann sich inzwischen geändert haben."
+      : "";
+    notice.hidden = !note;
+    notice.textContent = note;
 
     if (data.links) {
       if (data.links.updown) document.getElementById("link-updown").href = data.links.updown;
@@ -326,8 +403,9 @@ footer p { margin: 0; }
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(render)
       .catch(function () {
-        document.getElementById("headline").textContent = "Status nicht verfügbar";
-        document.getElementById("summary").className = "summary";
+        var state = document.getElementById("state");
+        state.textContent = "Status nicht verfügbar";
+        state.className = "state-line";
         document.getElementById("stand").textContent = "Die Statusdaten konnten nicht geladen werden. Bitte später neu laden.";
       });
   }

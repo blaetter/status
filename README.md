@@ -23,7 +23,7 @@ Check names, measurements, error messages and ping URLs are never published. The
 | File | Purpose |
 |---|---|
 | `index.html`, `assets/` | the page; logo and fonts are served from this repository, nothing is loaded from third parties |
-| `status.json` | **sample data** for local preview (`"sample": true`); the live data lives in the branch `status-data` |
+| `status.json`, `status.ok.json` | **sample data** for local preview (`"sample": true`): with faults, and with everything fine; the live data lives in the branch `status-data` |
 | `config.json` | which checks appear, under which label and in which order |
 | `scripts/build-status.sh` | builds `status.json` from both APIs (`curl`, `jq`) |
 | `tests/run.sh` | tests the build script against the sample responses in `tests/fixtures/` |
@@ -49,7 +49,7 @@ Check names, measurements, error messages and ping URLs are never published. The
 python3 -m http.server 8765
 ```
 
-Open <http://localhost:8765>; on `localhost` the page reads the sample data from `status.json` instead of the live data.
+Open <http://localhost:8765>; on `localhost` the page reads the sample data from `status.json` instead of the live data. `?sample=ok` shows `status.ok.json` instead, where everything is fine.
 
 With real data (keys only in your own shell, never commit them):
 
@@ -70,4 +70,4 @@ Create the check at updown.io or healthchecks.io, then add it to `config.json`: 
 
 ## Licenses
 
-The fonts in `assets/fonts/` are Playfair Display (SIL Open Font License 1.1) and Droid Sans (Apache License 2.0); see the license files next to them. The logo belongs to *Blätter für deutsche und internationale Politik*.
+The fonts in `assets/fonts/` are Playfair Display (SIL Open Font License 1.1), Droid Sans and Droid Serif (both Apache License 2.0); see the license files next to them. The design follows the design system of the Blätter archive. The logo belongs to *Blätter für deutsche und internationale Politik*.
