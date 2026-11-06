@@ -61,6 +61,10 @@ UPDOWN_API_KEY=… HEALTHCHECKS_API_KEY=… scripts/build-status.sh /tmp/status.
 
 Create the check at updown.io or healthchecks.io, then add it to `config.json`: websites by host name under `websites`, healthchecks.io checks by their name with a `label` and a `group` (`servers` or `backups`). Labels are shown on the page, so keep them free of internal details.
 
+## Colours
+
+Colours and fonts come from the design tokens of the Blätter layouts, repository [blaetter-design](https://github.com/blaetter/blaetter-design) (`tokens.json` there is the only source). `assets/css/tokens.css` and `assets/css/tokens-dark.css` are verbatim copies of its `dist/`; `index.html` only aliases the `--blaetter-*` properties and sets no colours of its own. After a change in blaetter-design, copy both files again. `tests/design-tokens.sh [path to blaetter-design]` checks both; the workflow *Publish page* runs it against the current blaetter-design and does not publish when it fails.
+
 ## Maintenance
 
 - **GitHub Actions**: Dependabot opens a pull request when a new version is released. Review and merge it.

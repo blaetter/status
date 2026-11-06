@@ -6,6 +6,8 @@
 <meta name="robots" content="noindex">
 <title>Blätter Status</title>
 <link rel="icon" href="assets/img/logo_palm.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/tokens-dark.css">
 <script>
   // Apply a stored light/dark choice before the page renders (see the toggle below)
   try { var t = localStorage.getItem("status-theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) {}
@@ -14,12 +16,14 @@
 /*
  * Status page of the Blätter services.
  * Design follows the design system of the Blätter archive (blaetter-archiv, docs/design-system.html):
- * fonts, header, page heading, key figures, dividers, notice and footer. Colours are the tokens of
- * blaetter.de (--palm-color-*), dark colours as in archiv-dark.css.
- * State colours: the cover palette of 2026 from the archive (config/rubrics.yaml): red #C00840
- * (covers 1 and 7), green #609030 (4 and 10), ochre #B87800 (5 and 11); on dark pages mixed with
- * 20 % white as in archiv.js. Green and ochre reach only 3.7-3.8:1 on white, so they colour large
- * figures and dots (3:1 is enough), never small text.
+ * fonts, header, page heading, key figures, dividers, notice and footer.
+ * Colours and fonts come from assets/css/tokens.css and tokens-dark.css, verbatim copies of dist/ of
+ * the repository blaetter-design (tokens.json there is the only source); the names below only
+ * alias them. Never write hex values here: tests/design-tokens.sh fails on them and on copies
+ * that differ from blaetter-design.
+ * State colours: the cover palette of 2026 (red: covers 1 and 7, green: 4 and 10, ochre: 5 and
+ * 11); their dark values have 20 % white, as in the archive. Green and ochre reach only
+ * 3.7-3.8:1 on white, so they colour large figures and dots (3:1 is enough), never small text.
  */
 @font-face { font-family: "droid-serif"; font-weight: 400; font-style: normal; font-display: swap; src: url(assets/fonts/droid-serif-400.woff) format("woff"); }
 @font-face { font-family: "droid-sans"; font-weight: 400; font-style: normal; font-display: swap; src: url(assets/fonts/droid-sans-400.woff2) format("woff2"); }
@@ -27,36 +31,24 @@
 @font-face { font-family: "playfair"; font-weight: 700; font-style: normal; font-display: swap; src: url(assets/fonts/playfair-700.woff2) format("woff2"); }
 
 :root {
-  --bg: #ffffff;           /* --palm-color-white */
-  --text: #000000;         /* --palm-color-text */
-  --muted: #6b6b6b;        /* archive: muted text, 5.3:1 */
-  --link: #086D9A;         /* --palm-color-link */
-  --red: #E51736;          /* --palm-color-red, the red of the logo: labels, faults */
-  --surface: #f2f2f2;      /* --palm-color-grey */
-  --rule: #e3e3e3;         /* --palm-color-grey-dark */
-  --rule-strong: #CCCCCC;  /* --palm-color-grey-border */
-  --bad: #C00840;          /* cover red 1 and 7/2026 */
-  --ok: #609030;           /* cover green 4 and 10/2026 */
-  --warn: #B87800;         /* cover ochre 5 and 11/2026 */
-  --serif: "droid-serif", Georgia, "Times New Roman", serif;
-  --sans: "droid-sans", Arial, sans-serif;
-  --display: "playfair", Georgia, serif;
+  --bg: var(--blaetter-color-page);
+  --text: var(--blaetter-color-text);
+  --muted: var(--blaetter-color-muted);          /* archive: muted text, 5.3:1 */
+  --link: var(--blaetter-color-link);
+  --red: var(--blaetter-color-red);              /* the red of the logo: labels, faults */
+  --surface: var(--blaetter-color-surface);
+  --rule: var(--blaetter-color-rule);
+  --rule-strong: var(--blaetter-color-rule-strong);
+  --bad: var(--blaetter-cover-red);              /* cover red 1 and 7/2026 */
+  --ok: var(--blaetter-cover-green);             /* cover green 4 and 10/2026 */
+  --warn: var(--blaetter-cover-ochre);           /* cover ochre 5 and 11/2026 */
+  --serif: var(--blaetter-font-serif);
+  --sans: var(--blaetter-font-sans);
+  --display: var(--blaetter-font-display);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #161616; --text: #E8E8E8; --muted: #A3A3A3; --link: #5DB4E3; --red: #EC465D;
-    --surface: #262626; --rule: #333333; --rule-strong: #4A4A4A;
-    --bad: #CD3966; --ok: #80A659; --warn: #C69333;
-    color-scheme: dark;
-  }
   :root:not([data-theme="light"]) .brand .claim { filter: invert(1) hue-rotate(180deg); }
-}
-:root[data-theme="dark"] {
-  --bg: #161616; --text: #E8E8E8; --muted: #A3A3A3; --link: #5DB4E3; --red: #EC465D;
-  --surface: #262626; --rule: #333333; --rule-strong: #4A4A4A;
-  --bad: #CD3966; --ok: #80A659; --warn: #C69333;
-  color-scheme: dark;
 }
 :root[data-theme="dark"] .brand .claim { filter: invert(1) hue-rotate(180deg); }
 

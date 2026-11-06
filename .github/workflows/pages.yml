@@ -9,6 +9,7 @@ on:
     paths:
       - index.html
       - assets/**
+      - tests/design-tokens.sh
       - .github/workflows/pages.yml
   workflow_dispatch:
 
@@ -25,6 +26,17 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7.0.1
+
+      # Colours and fonts come from the design tokens of the Blätter layouts (public repository);
+      # the page is not published when its copies differ or it sets colours of its own.
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: blaetter/blaetter-design
+          path: .design
+          persist-credentials: false
+
+      - name: Colours match blaetter-design
+        run: tests/design-tokens.sh .design
 
       - name: Collect page files
         run: |
