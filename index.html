@@ -201,6 +201,11 @@ footer p { margin: 0; }
 
   var SSL_WARN_DAYS = 14;
   var STALE_MINUTES = 20;
+  // Live data comes from the branch status-data, so data updates need no Pages deployment.
+  // Local preview reads the sample status.json next to this file.
+  var DATA_URL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+    ? "status.json"
+    : "https://raw.githubusercontent.com/blaetter/status/status-data/status.json";
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -317,7 +322,7 @@ footer p { margin: 0; }
   }
 
   function load() {
-    fetch("status.json?t=" + Date.now(), { cache: "no-store" })
+    fetch(DATA_URL + "?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(render)
       .catch(function () {

@@ -2,7 +2,12 @@
 
 Public overview of whether the services of *Blätter für deutsche und internationale Politik* are up. The page is for a quick look only; alerting is handled by the monitoring services themselves.
 
-A GitHub Actions workflow queries updown.io and healthchecks.io, writes `status.json` and publishes the page with GitHub Pages, so the page does not depend on the monitored infrastructure. The page itself is in German, as it is meant for the Blätter team and readers.
+Two GitHub Actions workflows keep page and data apart, so neither depends on the monitored infrastructure:
+
+- **Update status** (`status.yml`, every 5 minutes): queries updown.io and healthchecks.io, writes `status.json` and force-pushes it as the only file of the branch `status-data`. The page loads it from `https://raw.githubusercontent.com/blaetter/status/status-data/status.json` (cached for up to 5 minutes).
+- **Publish page** (`pages.yml`): publishes `index.html` and `assets/` with GitHub Pages, only when they change on `main` or when started by hand.
+
+Data updates therefore need no Pages deployment. While the whole site was deployed every 5 minutes, GitHub Pages once stopped applying new deployments for hours, although each one reported success. The page itself is in German, as it is meant for the Blätter team and readers.
 
 ## What becomes public
 
@@ -18,11 +23,12 @@ Check names, measurements, error messages and ping URLs are never published. The
 | File | Purpose |
 |---|---|
 | `index.html`, `assets/` | the page; logo and fonts are served from this repository, nothing is loaded from third parties |
-| `status.json` | **sample data** for local preview (`"sample": true`); replaced by the workflow on deploy |
+| `status.json` | **sample data** for local preview (`"sample": true`); the live data lives in the branch `status-data` |
 | `config.json` | which checks appear, under which label and in which order |
 | `scripts/build-status.sh` | builds `status.json` from both APIs (`curl`, `jq`) |
 | `tests/run.sh` | tests the build script against the sample responses in `tests/fixtures/` |
-| `.github/workflows/status.yml` | test, build and deploy; weekly keepalive commit |
+| `.github/workflows/status.yml` | tests, builds `status.json`, force-pushes it to `status-data` |
+| `.github/workflows/pages.yml` | publishes the page with GitHub Pages when `index.html` or `assets/` change |
 | `.github/dependabot.yml` | monthly pull requests for new versions of the GitHub Actions used |
 
 ## Setup
@@ -43,7 +49,7 @@ Check names, measurements, error messages and ping URLs are never published. The
 python3 -m http.server 8765
 ```
 
-Open <http://localhost:8765>; it shows the sample data from `status.json`.
+Open <http://localhost:8765>; on `localhost` the page reads the sample data from `status.json` instead of the live data.
 
 With real data (keys only in your own shell, never commit them):
 
@@ -59,7 +65,8 @@ Create the check at updown.io or healthchecks.io, then add it to `config.json`: 
 
 - **GitHub Actions**: Dependabot opens a pull request when a new version is released. Review and merge it.
 - **Runner image**: the workflow uses `ubuntu-latest`, which GitHub keeps updated. The build only needs `bash`, `curl` and `jq`, so image changes are not expected to matter.
-- **Access token** of the external scheduler: renew before it expires.
+- **Access token** of the external scheduler: renew before it expires. The main trigger is this external call (`workflow_dispatch`), which GitHub does not disable for inactive repositories; the fallback schedule may be disabled after 60 days without activity.
+- **Branch `status-data`**: written only by the workflow; it always holds a single commit. Do not commit to it by hand.
 
 ## Licenses
 

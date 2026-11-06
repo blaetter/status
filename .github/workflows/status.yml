@@ -1,22 +1,23 @@
 name: Update status
 
+# Builds status.json and force-pushes it as the only file of the branch
+# `status-data`. The page loads it from raw.githubusercontent.com, so data
+# updates need no GitHub Pages deployment.
+
 on:
+  workflow_dispatch:         # main trigger, called every 5 minutes by an external scheduler
   schedule:
     - cron: "*/5 * * * *"   # fallback only: GitHub often skips short schedules
-    - cron: "17 4 * * 1"    # Mondays: keepalive commit, see below
-  workflow_dispatch:         # main trigger, called every 5 minutes by an external scheduler
-  push:
-    branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: status-data
+  cancel-in-progress: true
 
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -29,45 +30,14 @@ jobs:
         env:
           UPDOWN_API_KEY: ${{ secrets.UPDOWN_API_KEY }}
           HEALTHCHECKS_API_KEY: ${{ secrets.HEALTHCHECKS_API_KEY }}
+        run: scripts/build-status.sh "$RUNNER_TEMP/status.json"
+
+      - name: Publish to branch status-data
         run: |
-          mkdir -p _site
-          cp -r index.html assets .nojekyll _site/
-          scripts/build-status.sh _site/status.json
-
-      - uses: actions/configure-pages@v6.0.0
-
-      - uses: actions/upload-pages-artifact@v5.0.0
-        with:
-          path: _site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v5.0.1
-
-  # GitHub disables schedules in public repositories after 60 days without activity.
-  keepalive:
-    if: github.event.schedule == '17 4 * * 1'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - name: Commit keepalive timestamp
-        run: |
-          date -u +%FT%TZ > .github/keepalive
+          git switch --orphan status-data
+          cp "$RUNNER_TEMP/status.json" status.json
+          git add status.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/keepalive
-          git commit -m "Keepalive for scheduled workflows"
-          git push
+          git commit -q -m "Update status data"
+          git push -q --force origin status-data
