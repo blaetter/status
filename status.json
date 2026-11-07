@@ -1,0 +1,88 @@
+{
+  "generated": "2026-11-07T14:10:32Z",
+  "links": {
+    "updown": "https://updown.io/checks",
+    "healthchecks": "https://healthchecks.io/"
+  },
+  "websites": [
+    {
+      "name": "Blätter Homepage",
+      "up": true,
+      "ssl_days": 81
+    },
+    {
+      "name": "Blätter Umfrage (LimeSurvey)",
+      "up": true,
+      "ssl_days": 61
+    },
+    {
+      "name": "ePub-Download",
+      "up": true,
+      "ssl_days": 41
+    },
+    {
+      "name": "Blätter Stats (Matomo)",
+      "up": true,
+      "ssl_days": 74
+    },
+    {
+      "name": "Redirect Homepage (Blätter)",
+      "up": true,
+      "ssl_days": 81
+    },
+    {
+      "name": "Redirect Homepage (insel-der-vernunft.de)",
+      "up": true,
+      "ssl_days": 67
+    }
+  ],
+  "servers": [
+    {
+      "name": "Live-Server",
+      "status": "up",
+      "last_ping": "2026-11-07T14:10:08+00:00"
+    },
+    {
+      "name": "Statistik-Server",
+      "status": "up",
+      "last_ping": "2026-11-07T14:10:01+00:00"
+    },
+    {
+      "name": "Stage-Server",
+      "status": "up",
+      "last_ping": "2026-11-07T14:10:04+00:00"
+    }
+  ],
+  "backups": [
+    {
+      "name": "Live-Server: Datenbank",
+      "status": "up",
+      "last_ping": "2026-11-07T00:32:17+00:00"
+    },
+    {
+      "name": "Live-Server: Dateien",
+      "status": "up",
+      "last_ping": "2026-11-07T13:16:19+00:00"
+    },
+    {
+      "name": "Live-Server: Prüfung",
+      "status": "up",
+      "last_ping": "2026-11-01T04:10:49+00:00"
+    },
+    {
+      "name": "Statistik-Server: Datenbank",
+      "status": "up",
+      "last_ping": "2026-11-07T00:37:19+00:00"
+    },
+    {
+      "name": "Statistik-Server: Dateien",
+      "status": "up",
+      "last_ping": "2026-11-07T13:15:11+00:00"
+    },
+    {
+      "name": "Statistik-Server: Prüfung",
+      "status": "up",
+      "last_ping": "2026-11-01T03:26:24+00:00"
+    }
+  ]
+}
