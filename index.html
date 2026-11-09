@@ -158,8 +158,10 @@ ul.checks li {
 .footer-palm { display: block; width: 70px; height: auto; margin: 0 auto; }
 .site-footer p { margin: 16px auto 0; max-width: 40em; }
 
-@media (max-width: 700px) {
+/* Phones: the phone step of the design tokens (45rem = 720 px), as in the archive */
+@media (max-width: 45rem) {
   body { font-size: 17px; }
+  .wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   .brand .palm { width: 30px; height: 30px; }
   .brand .claim { width: 100px; height: 21.35px; }
   .site-header.compact { padding: 14px 0; margin-bottom: 0; }
