@@ -67,11 +67,11 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--link); outline-
   padding-right: max(24px, env(safe-area-inset-right, 0px));
 }
 
-/* Header as in the archive: palm 40 px, claim 120 px, 7 px apart, thin rule below */
+/* Header as in the archive: palm 40 px, claim 120 px, 7 px apart, padding 12 px (spacing token s, small header 8 px = xs), thin rule below; the same on phones */
 /* Sticky as in the archive: stays at the top and gets smaller once scrolled; the margin below
    grows by what the header loses, so the content does not move */
-.site-header { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--rule); padding: 14px 0; background: var(--bg); }
-.site-header.compact { padding: 10px 0; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+.site-header { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--rule); padding: 12px 0; background: var(--bg); }
+.site-header.compact { padding: 8px 0; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
 .site-header.compact .brand .palm { width: 30px; height: 30px; }
 .site-header.compact .brand .claim { width: 100px; height: 21.35px; }
 .site-header.compact .nav, .site-header.compact .theme-toggle { line-height: 30px; height: 30px; }
@@ -124,7 +124,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--link); outline-
 section { margin-top: 40px; }
 .divider {
   position: sticky;
-  top: var(--header-h, 69px);
+  top: var(--header-h, 65px);
   z-index: 5;
   background: var(--bg);
   box-shadow: 0 6px 0 var(--bg);   /* also hides rows in the gap below the rule while they scroll past */
@@ -162,9 +162,6 @@ ul.checks li {
 @media (max-width: 45rem) {
   body { font-size: 17px; }
   .wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-  .brand .palm { width: 30px; height: 30px; }
-  .brand .claim { width: 100px; height: 21.35px; }
-  .site-header.compact { padding: 14px 0; margin-bottom: 0; }
   .heading { font-size: 19px; line-height: 24px; }
   .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 4%; }
   .figure { font-size: 32px; }
