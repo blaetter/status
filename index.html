@@ -256,6 +256,23 @@ ul.checks li {
   onScroll();
   setHeaderHeight();
 
+  // Browser tab: a dot in the state colour as favicon and the headline in the title, so the state
+  // shows without switching to the tab. Grey when the data is stale or missing. The colour is read
+  // from the tokens at run time (no hex values in this file) and follows the light/dark choice.
+  var icon = document.querySelector('link[rel="icon"]');
+  var tab = null;
+  function setTab(level, text) {
+    tab = { level: level, text: text };
+    var colour = getComputedStyle(root).getPropertyValue("--" + (level || "muted")).trim();
+    icon.type = "image/svg+xml";
+    icon.href = "data:image/svg+xml," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="' + colour + '"/></svg>');
+    document.title = text + " · Blätter Status";
+  }
+  function refreshTab() { if (tab) setTab(tab.level, tab.text); }
+  document.getElementById("theme-toggle").addEventListener("click", refreshTab);
+  if (dark && dark.addEventListener) dark.addEventListener("change", refreshTab);
+
   function el(tag, cls, text) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -348,7 +365,6 @@ ul.checks li {
     var state = document.getElementById("state");
     state.textContent = headline;
     state.className = "state-line " + (nBad ? "bad" : nWarn ? "warn" : "ok");
-    document.title = (nBad ? "Störung · " : "") + "Blätter Status";
 
     var aff = document.getElementById("affected");
     aff.hidden = !affected.length;
@@ -384,6 +400,8 @@ ul.checks li {
       : "";
     notice.hidden = !note;
     notice.textContent = note;
+    if (age > STALE_MINUTES && !data.sample) setTab("", "Daten veraltet");
+    else setTab(nBad ? "bad" : nWarn ? "warn" : "ok", headline);
 
     if (data.links) {
       if (data.links.updown) document.getElementById("link-updown").href = data.links.updown;
@@ -399,6 +417,7 @@ ul.checks li {
         var state = document.getElementById("state");
         state.textContent = "Status nicht verfügbar";
         state.className = "state-line";
+        setTab("", "Status nicht verfügbar");
         document.getElementById("stand").textContent = "Die Statusdaten konnten nicht geladen werden. Bitte später neu laden.";
       });
   }
