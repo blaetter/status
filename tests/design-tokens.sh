@@ -1,7 +1,8 @@
 #!/bin/bash
 # Checks the colours of the page against the design tokens of the Blätter layouts:
 # assets/css/tokens.css and tokens-dark.css must be verbatim copies of dist/ of the repository
-# blaetter-design, and index.html must not set colours of its own (no hex values outside comments).
+# blaetter-design, index.html must not set colours of its own (no hex values outside comments), and
+# assets/img/favicon.svg must be the palm in the muted grey of the tokens.
 #   tests/design-tokens.sh [path to a blaetter-design checkout, default ../blaetter-design]
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -23,5 +24,15 @@ if [ -z "$hex" ]; then
   echo "ok   index.html uses only the tokens"
 else
   echo "FAIL index.html sets colours of its own (use the --blaetter-* tokens):"; echo "$hex"; fail=1
+fi
+
+# The favicon is shown before the data has loaded, so it is the palm in the muted grey: an SVG
+# favicon cannot read the tokens, so it must equal logo_palm.svg with that colour as first fill.
+muted=$(sed -n 's/^  --blaetter-color-muted: \(#[0-9a-fA-F]*\);$/\1/p' assets/css/tokens.css | head -n 1)
+expected=$(perl -pe 'BEGIN { $m = shift } if (!$done && s/fill="[^"]*"/fill="$m"/) { $done = 1 }' "$muted" assets/img/logo_palm.svg)
+if [ -n "$muted" ] && [ "$expected" = "$(cat assets/img/favicon.svg)" ]; then
+  echo "ok   assets/img/favicon.svg is the palm in --blaetter-color-muted"
+else
+  echo "FAIL assets/img/favicon.svg must be assets/img/logo_palm.svg with --blaetter-color-muted ($muted) as first fill"; fail=1
 fi
 exit $fail
